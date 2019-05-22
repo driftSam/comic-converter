@@ -10,9 +10,9 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.longbox.convert</groupId>
-	<artifactId>file-converter</artifactId>
+	<artifactId>comic-converter</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>file-converter</name>
+	<name>comic-converter</name>
 	<description>Service to convert CBR to CBZ</description>
 
 	<properties>
