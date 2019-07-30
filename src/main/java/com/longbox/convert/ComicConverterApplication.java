@@ -22,7 +22,7 @@ public class ComicConverterApplication {
 
 	static final String directExchangeName = "comic-exchange";
 
-	static final String queueName = "comic-rar";
+	static final String queueName = "comic.rar";
 
 	@Bean
 	Queue queue() {
