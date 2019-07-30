@@ -7,14 +7,13 @@ import org.springframework.amqp.core.BindingBuilder;
 import org.springframework.amqp.core.DirectExchange;
 import org.springframework.amqp.core.Queue;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
-import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.rabbit.listener.SimpleMessageListenerContainer;
 import org.springframework.amqp.rabbit.listener.adapter.MessageListenerAdapter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import com.longbox.convert.messaging.Receiver;
+import com.longbox.convert.messaging.ConverterMessageReceiver;
 
 @SpringBootApplication
 public class ComicConverterApplication {
@@ -23,12 +22,7 @@ public class ComicConverterApplication {
 
 	static final String directExchangeName = "comic-exchange";
 
-	static final String queueName = "spring-boot";
-	private final RabbitTemplate rabbitTemplate;
-
-	public ComicConverterApplication(RabbitTemplate rabbitTemplate) {
-		this.rabbitTemplate = rabbitTemplate;
-	}
+	static final String queueName = "comic-rar";
 
 	@Bean
 	Queue queue() {
@@ -56,7 +50,7 @@ public class ComicConverterApplication {
 	}
 
 	@Bean
-	MessageListenerAdapter listenerAdapter(Receiver receiver) {
+	MessageListenerAdapter listenerAdapter(ConverterMessageReceiver receiver) {
 		return new MessageListenerAdapter(receiver, "receiveMessage");
 	}
 
