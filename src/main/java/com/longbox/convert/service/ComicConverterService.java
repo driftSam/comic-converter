@@ -42,15 +42,16 @@ public class ComicConverterService {
 
 		if (archive != null) {
 			archive.getMainHeader().print();
-			FileHeader fh = archive.nextFileHeader();
 
-			while (fh != null) {
-				File output = Paths.get(outputDir + fh.getFileNameString().trim()).toFile();
-				System.out.println("output abs path: " + output.getAbsolutePath());
-				OutputStream os = Files.newOutputStream(output.toPath());
+			while (archive.iterator().hasNext()) {
+				FileHeader fh = archive.iterator().next();
+				if (!fh.isDirectory()) {
+					File output = Paths.get(outputDir + fh.getFileNameString().trim()).toFile();
+					System.out.println("output abs path: " + output.getAbsolutePath());
+					OutputStream os = Files.newOutputStream(output.toPath());
 
-				archive.extractFile(fh, os);
-				fh = archive.nextFileHeader();
+					archive.extractFile(fh, os);
+				}
 			}
 		}
 
