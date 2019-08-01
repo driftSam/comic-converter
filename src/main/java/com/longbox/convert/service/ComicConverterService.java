@@ -1,9 +1,6 @@
 package com.longbox.convert.service;
 
-import java.io.File;
 import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
@@ -13,8 +10,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import com.github.junrar.Archive;
+import com.github.junrar.Junrar;
 import com.github.junrar.exception.RarException;
-import com.github.junrar.rarfile.FileHeader;
 
 @Component
 public class ComicConverterService {
@@ -38,22 +35,6 @@ public class ComicConverterService {
 	}
 
 	private void extract(Path rarComic) throws RarException, IOException {
-		archive = new Archive(Files.newInputStream(rarComic));
-
-		if (archive != null) {
-			archive.getMainHeader().print();
-
-			while (archive.iterator().hasNext()) {
-				FileHeader fh = archive.iterator().next();
-				if (!fh.isDirectory()) {
-					File output = Paths.get(outputDir + fh.getFileNameString().trim()).toFile();
-					System.out.println("output abs path: " + output.getAbsolutePath());
-					OutputStream os = Files.newOutputStream(output.toPath());
-
-					archive.extractFile(fh, os);
-				}
-			}
-		}
-
+		Junrar.extract(rarComic.toFile(), Paths.get(outputDir).toFile());
 	}
 }
