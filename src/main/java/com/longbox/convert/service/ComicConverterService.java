@@ -94,6 +94,7 @@ public class ComicConverterService {
 	private void cleanupTemp(Path tempDirPath) throws IOException {
 		Files.walk(tempDirPath).forEach(path -> {
 			if (Files.isDirectory(path)) {
+				System.out.println(path.toString());
 				try {
 					if (!Files.newDirectoryStream(path).iterator().hasNext())
 						Files.delete(path);
