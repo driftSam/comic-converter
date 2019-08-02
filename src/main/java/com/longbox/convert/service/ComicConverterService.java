@@ -40,12 +40,12 @@ public class ComicConverterService {
 		Path rarComicPath = Paths.get(comic);
 		Path tempDirPath = Paths.get(tempDirName);
 		Path zipDirPath = Paths.get(zipDirName);
-		Path zipDirPathFinal = Paths.get(zipDirPath.toString() + "/"
-				+ FilenameUtils.getBaseName(rarComicPath.getFileName().toString()) + ".zip");
+		Path zipDirPathWithName = Paths.get(zipDirPath.toString() + "/"
+				+ FilenameUtils.getBaseName(rarComicPath.getFileName().toString()) + ".cbz");
 		System.out.println("Comic to convert: " + rarComicPath.toString());
 		try {
 			List<Path> contents = extract(rarComicPath, tempDirPath);
-			zip(contents, zipDirPathFinal);
+			zip(contents, zipDirPathWithName);
 			Files.move(rarComicPath, Paths.get(trashDirName + rarComicPath.getFileName()));
 			cleanupTemp(tempDirPath);
 
