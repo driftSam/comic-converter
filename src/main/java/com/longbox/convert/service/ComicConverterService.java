@@ -61,7 +61,8 @@ public class ComicConverterService {
 	private void zip(List<Path> contents, Path zipDirPathFinal) throws IOException {
 		try (ZipOutputStream zos = new ZipOutputStream(Files.newOutputStream(zipDirPathFinal))) {
 			contents.forEach(path -> {
-				ZipEntry zipEntry = new ZipEntry(path.toString());
+				Path sourceDir = path.getParent();
+				ZipEntry zipEntry = new ZipEntry(sourceDir.relativize(path).toString());
 				try {
 					zos.putNextEntry(zipEntry);
 					zos.write(Files.readAllBytes(path));
