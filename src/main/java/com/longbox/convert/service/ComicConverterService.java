@@ -2,6 +2,8 @@ package com.longbox.convert.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.RandomAccessFile;
+import java.nio.channels.FileChannel;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -31,16 +33,21 @@ public class ComicConverterService {
 	@Value("${zip.dir}")
 	String zipDirName;
 
+	@Value("${trash.dir}")
+	String trashDirName;
+
 	public void convert(String comic) {
 		Path rarComicPath = Paths.get(comic);
 		Path tempDirPath = Paths.get(tempDirName);
 		Path zipDirPath = Paths.get(zipDirName);
 		Path zipDirPathFinal = Paths.get(zipDirPath.toString() + "/"
-				+ FilenameUtils.getBaseName(rarComicPath.getFileName().toString()) + ".cbz");
+				+ FilenameUtils.getBaseName(rarComicPath.getFileName().toString()) + ".zip");
 		System.out.println("Comic to convert: " + rarComicPath.toString());
 		try {
 			List<Path> contents = extract(rarComicPath, tempDirPath);
 			zip(contents, zipDirPathFinal);
+			Files.move(rarComicPath, Paths.get(trashDirName + rarComicPath.getFileName()));
+			cleanupTemp(tempDirPath);
 
 		} catch (RarException | IOException e) {
 			// TODO Auto-generated catch block
@@ -53,7 +60,14 @@ public class ComicConverterService {
 		List<File> files = Junrar.extract(rarComic.toFile(), outputPath.toFile());
 
 		for (File file : files) {
-			paths.add(file.toPath());
+			if (!file.isDirectory()) {
+				RandomAccessFile raf = new RandomAccessFile(file, "rw");
+				FileChannel channel = raf.getChannel();
+				channel.lock();
+				raf.close();
+				paths.add(file.toPath());
+			}
+
 		}
 		return paths;
 	}
@@ -67,6 +81,7 @@ public class ComicConverterService {
 					zos.putNextEntry(zipEntry);
 					zos.write(Files.readAllBytes(path));
 					zos.closeEntry();
+					Files.delete(path);
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -74,5 +89,19 @@ public class ComicConverterService {
 
 			});
 		}
+	}
+
+	private void cleanupTemp(Path tempDirPath) throws IOException {
+		Files.walk(tempDirPath).forEach(path -> {
+			if (Files.isDirectory(path)) {
+				try {
+					if (!Files.newDirectoryStream(path).iterator().hasNext())
+						Files.delete(path);
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 }
